@@ -1,0 +1,4 @@
+pipeline,pq,sq,rq,tp,fp,fn,gt_with_2plus_preds,pred_with_2plus_gt,mean_iou_overlapping_pairs,mean_dice_overlapping_pairs
+first stage,0.4258,0.6777,0.6282,5329,3437,2870,394,257,0.5704,0.7025
+refined,0.4312,0.6764,0.6375,5250,3022,2949,371,281,0.5708,0.7029
+final,0.4448,0.6792,0.655,4979,2026,3220,242,262,0.5899,0.7219

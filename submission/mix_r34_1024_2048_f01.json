@@ -1,0 +1,76 @@
+{
+  "file": "mix_r34_1024_2048_f01.csv",
+  "sha256": "37ed551b5da6de3b531234d86f64e189363286e0382d93727be4ee12939509db",
+  "created_utc": "2026-10-29T13:56:46+00:00",
+  "git_commit": "bfc0209d8a36bf6bdb69021a055b3617d2b8dfef",
+  "git_dirty": false,
+  "models": {
+    "data/models/unet_r34_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_f0",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2"
+    },
+    "data/models/unet_r34_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_f1",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft"
+    },
+    "data/models/unet_r34_r2048_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_r2048_f0",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_r2048_f1",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    }
+  },
+  "postprocess": {
+    "threshold": 0.5,
+    "min_area": 300,
+    "merge_dist": 15,
+    "seed_threshold": null,
+    "min_mean_prob": null,
+    "ensemble": "mean of probability maps"
+  },
+  "cv": {
+    "fold0_pair_A_R2048": 0.4199,
+    "fold1_pair_A_R2048": 0.4336,
+    "note": "each pair scored on its own fold; the 4-model mix has no out-of-fold score"
+  },
+  "rows": 1395,
+  "images": 177,
+  "note": "Calibration 3: 2-fold 1024 + 2048 mix. Approved by the supervisor session for Nhat.",
+  "lb_public": 0.36,
+  "kaggle_submission_id": 57773048
+}

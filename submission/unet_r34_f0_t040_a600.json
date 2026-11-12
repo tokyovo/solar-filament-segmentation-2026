@@ -1,0 +1,37 @@
+{
+  "file": "unet_r34_f0_t040_a600.csv",
+  "sha256": "405af502def9a9f3e21f9160a910858050bf1c43ef9f52284ea9f2cd70413540",
+  "created_utc": "2026-10-29T07:25:43+00:00",
+  "git_commit": "bfc611e056f760a619d871cd081c46c3931f492a",
+  "git_dirty": false,
+  "models": {
+    "data/models/unet_r34_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_f0",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2"
+    }
+  },
+  "postprocess": {
+    "threshold": 0.4,
+    "min_area": 600,
+    "merge_dist": 0,
+    "seed_threshold": null
+  },
+  "cv": {
+    "fold0_pq": 0.4066,
+    "fold0_sq": 0.6735,
+    "fold0_rq": 0.6036,
+    "note": "threshold and min_area tuned on fold 0"
+  },
+  "rows": 1170,
+  "images": 176,
+  "note": "Calibration submission: first link between local PQ and the public board. Approved by the supervisor session for Nhat. The CSV was written by commit 6dc7c86 code or by 9543cde; both give the same masks with these settings.",
+  "lb_public": 0.34,
+  "kaggle_submission_id": 57763107
+}

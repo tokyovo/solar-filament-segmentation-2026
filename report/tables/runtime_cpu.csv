@@ -1,0 +1,8 @@
+device,stage,seconds_per_image,images
+cpu,load image,0.908,2
+cpu,5 U-Nets at 1024,14.224,2
+cpu,5 U-Nets at 2048,59.48,2
+cpu,post-processing,0.082,2
+cpu,5 seed refiners,4.105,2
+cpu,RLE encoding,0.032,2
+cpu,total,78.831,2

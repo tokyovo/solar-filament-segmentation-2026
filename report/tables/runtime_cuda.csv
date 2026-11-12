@@ -1,0 +1,8 @@
+device,stage,seconds_per_image,images
+cuda,load image,0.012,10
+cuda,5 U-Nets at 1024,0.24,10
+cuda,5 U-Nets at 2048,0.831,10
+cuda,post-processing,0.076,10
+cuda,5 seed refiners,0.299,10
+cuda,RLE encoding,0.063,10
+cuda,total,1.521,10

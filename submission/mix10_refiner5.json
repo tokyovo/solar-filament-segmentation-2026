@@ -1,0 +1,273 @@
+{
+  "file": "mix10_refiner5.csv",
+  "sha256": "e66c87e65679f14bd1eb8790a98f23a5809fb02a7cf011281329eeb1ee0a082e",
+  "created_utc": "2026-10-31T15:59:08+00:00",
+  "git_commit": "70496d7cead0ea4ba0024f17185f3ed87019505e",
+  "git_dirty": false,
+  "models": {
+    "data/models/unet_r34_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_f0",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2"
+    },
+    "data/models/unet_r34_r2048_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_r2048_f0",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/refiner_v2_f0": {
+      "fold": 0,
+      "train_folds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "data/models/unet_r34_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_f1",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft"
+    },
+    "data/models/unet_r34_r2048_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_r2048_f1",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/refiner_v2_f1": {
+      "fold": 1,
+      "train_folds": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "data/models/unet_r34_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_f2",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_r2048_f2",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/refiner_v2_f2": {
+      "fold": 2,
+      "train_folds": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "data/models/unet_r34_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_f3",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_r2048_f3",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/refiner_v2_f3": {
+      "fold": 3,
+      "train_folds": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "data/models/unet_r34_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_f4",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_r2048_f4",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/refiner_v2_f4": {
+      "fold": 4,
+      "train_folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    }
+  },
+  "postprocess": {
+    "threshold": 0.5,
+    "min_area": 300,
+    "merge_dist": 15,
+    "tta": "hflip",
+    "ensemble": "mean of 10 first-stage maps",
+    "refiner": "mean of 5 seed refiners, threshold 0.5, contested pixels to the higher probability"
+  },
+  "cv": {
+    "oof_first_stage_per_fold": [
+      0.4201,
+      0.4334,
+      0.4196,
+      0.4233,
+      0.4336
+    ],
+    "oof_refined_per_fold": [
+      0.4274,
+      0.4401,
+      0.4192,
+      0.4283,
+      0.4425
+    ],
+    "oof_mean_first": 0.426,
+    "oof_mean_refined": 0.4315,
+    "note": "each refiner scored alone on its own fold; the test file averages all 5"
+  },
+  "rows": 1264,
+  "images": 177,
+  "note": "10-model mix + 5 seed refiners. Approved by the supervisor session for Nhat. Mean OOF gain +0.0055 (4 of 5 folds positive).",
+  "lb_public": 0.37,
+  "kaggle_submission_id": 57843779
+}

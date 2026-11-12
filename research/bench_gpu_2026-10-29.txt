@@ -1,0 +1,15 @@
+resnet34 crop 512 batch 8: peak 2.15 GiB, 17.2 Mpx/s
+resnet34 crop 768 batch 4: peak 2.36 GiB, 17.0 Mpx/s
+resnet34 crop 768 batch 6: peak 3.34 GiB, 17.9 Mpx/s
+resnet34 crop 1024 batch 2: peak 2.15 GiB, 16.9 Mpx/s
+resnet34 crop 1024 batch 4: peak 3.88 GiB, 17.8 Mpx/s
+resnet50 crop 512 batch 8: peak 3.43 GiB, 12.5 Mpx/s
+resnet50 crop 768 batch 4: peak 3.79 GiB, 12.4 Mpx/s
+resnet50 crop 768 batch 6: peak 5.42 GiB, 12.6 Mpx/s
+resnet50 crop 1024 batch 2: peak 3.43 GiB, 12.1 Mpx/s
+resnet50 crop 1024 batch 4: peak 6.32 GiB, 12.7 Mpx/s
+efficientnet-b3 crop 512 batch 8: peak 4.65 GiB, 12.8 Mpx/s
+efficientnet-b3 crop 768 batch 4: peak 5.18 GiB, 12.7 Mpx/s
+efficientnet-b3 crop 768 batch 6: OOM
+efficientnet-b3 crop 1024 batch 2: peak 4.62 GiB, 8.8 Mpx/s
+efficientnet-b3 crop 1024 batch 4: OOM

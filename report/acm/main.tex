@@ -1,0 +1,316 @@
+% =============================================================================
+% COPYRIGHT AND DISCLAIMER
+% =============================================================================
+% This file is provided as a convenience template for competition participants.
+% By using it, you accept full responsibility for compliance with all applicable
+% copyright, licensing, and usage rules of the Association for Computing
+% Machinery (ACM) and of any LaTeX packages you load (including, without
+% limitation, the "acmart" document class and related ACM materials).
+%
+% Consult ACM's official publication, template, and copyright policies before
+% using this setup for any purpose other than this competition. Do not assume
+% that this template may be reused, redistributed, or submitted elsewhere
+% without independently verifying ACM's current rules.
+%
+% Use of the "acmart" class, the "sigconf" option, or ACM-style formatting in
+% this template does NOT mean that this report, this competition, its organizers,
+% or any resulting PDF is sponsored, endorsed, affiliated with, or published by
+% ACM. ACM trademarks and branding remain the property of ACM.
+%
+% Template packages live in preamble.tex.
+% Citations live in main.bib. Edit this file with your paper content.
+% =============================================================================
+
+\documentclass[sigconf]{acmart}
+\input{preamble}
+\usepackage{tikz}  % added: pipeline diagram
+\usetikzlibrary{positioning,arrows.meta}
+
+% Guide styling: \guideStyletrue = show gray italic hints; \guideStylefalse = omit them
+\guideStylefalse
+% \guideStylefalse
+
+\begin{document}
+
+\title{Consensus U-Nets, a Seed Refiner and a Learned Filter for Solar Filament Segmentation}  % Replace this with your title
+\subtitle{A Solution to the Solar Filament Segmentation Challenge 2026} % DO NOT CHANGE
+
+
+\author{Nhat Vo} 
+\affiliation{%
+  \institution{Sensen.ai}  % <- Optional (remove if you are not currently affiliated with any institute)
+  \city{Melbourne}
+  \country{Australia}
+}
+\email{mr.nhatvo@gmail.com}   % <- Replace with your own email 
+
+% \author{\guide{Second Author}}
+% \affiliation{%
+%   \institution{\guide{Your Institution}}  % <- Optional (remove if you are not currently affiliated with any institute)
+%   \city{\guide{City}}
+%   \country{\guide{Country}}
+% }
+% \email{second.author@example.com}  % <- Replace with your own email
+
+\begin{abstract}
+    This report describes our solution to the Solar Filament Segmentation Challenge~2026, a Kaggle competition on automatic segmentation of solar filaments in GONG H-$\alpha$ observations. The training labels are noisy: annotators of the same image agree with each other at only
+PQ 0.34. Ten U-Nets (five folds at 1024 and five at 2048 pixels) learn the per-pixel mean of
+all annotators' masks; a simple post-processing step turns their mean map into candidate
+filaments; a seed refiner re-segments a crop around each candidate; and a learned filter
+removes candidates that annotators are unlikely to mark. Out of fold, the pipeline reaches
+PQ 0.445 on all 707 training images (95\% bootstrap interval 0.435--0.454), against 0.413 for
+a single U-Net. The public leaderboard score is 0.38. The code, the weights and a notebook
+that rebuilds the submission are in our repository.
+\end{abstract}
+
+\maketitle
+
+\ifguideStyle
+\noindent{\color{gray!65}\itshape
+Guide mode is on.}
+\par\medskip
+\fi
+
+\guide{Please limit your report to four (4) pages, excluding the Acknowledgment and References sections. Throughout this document, please follow these considerations: 
+\begin{itemize}
+    \item Do not alter any text that is currently in black color (except for the emails under authors' name).
+    \item Replace all gray text with your own.
+    \item When you are done with the report, please replace \texttt{\textbackslash guideStyletrue} with \texttt{\textbackslash guideStylefalse}, to remove any gray text. Alternatively, you can remove any text wrapped in \texttt{\textbackslash guide\{\}},
+    \item Be as succinct as possible, and only provide details regarding your own work. For example, there is no need to discuss what solar filaments are, or why filament segmentation matters.
+    \item If you must, you can add extra sections.
+\end{itemize}}
+
+
+% ==================================== %
+%              INTRODUCTION            %
+% ==================================== %
+\section{Introduction}
+    This report goes over the details of our submitted solution to the Solar Filament Segmentation Challenge~2026 \cite{filament-segmentation-2026}. The challenge, launched on July~10,~2026, is organized by the Earth-Space AI Research (ESAIR) Lab\footnote{\href{https://www.esairlab.com/home}{www.esairlab.com/}}. This challenge utilizes the MAGFiLO dataset for evaluation of the segmentation algorithms \cite{ahmadzadeh2024dataset}. 
+
+Each test image is a $2048\times2048$ grayscale H$\alpha$ full-disk image, and a submission
+gives one run-length mask per filament. The metric is Panoptic Quality
+(PQ)~\cite{kirillov2019panoptic}: a prediction and a ground-truth (GT) filament match when
+their IoU exceeds 0.5, and
+\[
+\mathrm{PQ}=\frac{\sum_{\mathrm{TP}}\mathrm{IoU}}{\mathrm{TP}+\tfrac12\mathrm{FP}+\tfrac12\mathrm{FN}}.
+\]
+Each annotator's labelling of an image (an \emph{entry}) is scored separately against the same
+predictions, and the counts are pooled. Our main finding is that the labels limit the score:
+when we score each annotator against the other annotators of the same image, PQ is only 0.340
+(SQ 0.634, RQ 0.536). Our design follows from this: learn the consensus, combine two
+resolutions, and reject candidates that annotators do not mark.
+
+
+% ==================================== %
+%              METHODOLOGY             %
+% ==================================== %
+\section{Methodology}\label{sec:methodology}
+
+\subsection{Data, sampling and splits}
+
+The training set has 707 images and 8,199 filament polygons from 37 annotators; 411 images
+have one annotation set, 145 have two and 151 have three (1,154 entries). Filaments are small:
+the median polygon covers 1,228 pixels (0.03\% of the image). We use five folds grouped by
+image, so all entries of an image stay in one fold. Filaments last several days, so we checked
+whether random folds are too easy: 28\% of validation images have a training image within one
+day, but for the test images the share is 36\%. Random folds therefore match the test
+situation, and folds by week would be harsher than the test. All numbers below are out of fold.
+
+During training, 70\% of crops are centred on a random filament pixel and 30\% are placed
+uniformly. Augmentations are flips, 90-degree rotations and small brightness and contrast
+changes. We ported the organisers' PQ to run-length masks; a unit test checks that it matches
+their notebook to $10^{-6}$.
+
+\subsection{Pipeline}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[node distance=3.2mm, font=\footnotesize,
+  box/.style={draw, rounded corners=1pt, align=center, inner sep=2.5pt, minimum width=36mm},
+  arr/.style={-{Stealth[length=1.6mm]}}]
+\node[box] (img) {H$\alpha$ image, $2048\times2048$};
+\node[box, below left=4mm and -14mm of img, minimum width=30mm] (a) {5 U-Nets at 1024\\(ResNet34, folds 0--4)};
+\node[box, below right=4mm and -14mm of img, minimum width=30mm] (b) {5 U-Nets at 2048\\(ResNet34, folds 0--4)};
+\node[box, below=14mm of img] (mean) {mean probability map\\(10 models, h-flip TTA)};
+\node[box, below=of mean] (cand) {threshold 0.5, connected regions,\\join gaps $<15$\,px, drop $<300$\,px};
+\node[box, below=of cand] (ref) {seed refiner on a crop per candidate\\(image, seed, probability; 5 folds)};
+\node[box, below=of ref] (filt) {learned filter: keep if predicted share\\of matching annotators $\geq 0.35$};
+\node[box, below=of filt] (out) {one mask per filament, no overlaps};
+\draw[arr] (img) -- (a); \draw[arr] (img) -- (b);
+\draw[arr] (a) -- (mean); \draw[arr] (b) -- (mean);
+\draw[arr] (mean) -- (cand); \draw[arr] (cand) -- (ref); \draw[arr] (ref) -- (filt); \draw[arr] (filt) -- (out);
+\end{tikzpicture}
+\caption{The end-to-end inference pipeline. Only the pixels of the test image are used.}
+\label{fig:pipeline}
+\end{figure}
+
+Fig.~\ref{fig:pipeline} shows the pipeline. It uses existing building blocks: U-Net
+\cite{ronneberger2015unet} with a ResNet34 encoder \cite{he2016resnet} (ImageNet start,
+segmentation-models-pytorch \cite{iakubovskii2019smp}). The seed refiner is our own design.
+
+\textbf{First stage.} Each U-Net has one input channel. Its target is the fraction of
+annotators that marked each pixel, a soft label in $[0,1]$; the loss is binary cross-entropy
+plus soft Dice. Per fold we train a \emph{1024 model} (image downscaled to 1024, random
+$512^2$ crops, batch 8, 60 epochs) and a \emph{2048 model} (full resolution, $1024^2$ crops,
+batch 4, 60 epochs). Both crops cover the same part of the disk; the 2048 model sees four
+times the detail. At inference we average the logits of the image and its horizontal flip,
+then the probability maps of all ten models.
+
+\textbf{Candidates (post-processing).} The mean map is thresholded at 0.5. Connected regions
+closer than 15 pixels form one candidate, which joins fragments without changing any mask
+pixel; candidates under 300 pixels are removed. These three values were chosen on folds 0
+and 1 from 108 settings and then fixed.
+
+\textbf{Seed refiner.} Most first-stage errors are candidates on unmarked places or with too
+little overlap, not merges (Section~\ref{sec:weak}). The refiner looks at one candidate at a
+time: a square crop (1.5 times its bounding box, at least 128 pixels, resized to 256) with
+three channels, namely the image, the candidate mask (the \emph{seed}) and the first-stage
+probability. Its target is, for each annotator, the union of the GT filaments that touch the
+candidate, averaged over the annotators; a candidate that touches no GT filament has an empty
+target, so the refiner learns to reject it. The refiner is a three-channel ResNet34 U-Net,
+trained for 30 epochs on the candidates of the other four folds, which come from out-of-fold
+maps and so look like test candidates. At inference the five fold refiners are averaged; each
+contested pixel goes to the candidate with the higher probability, so masks never overlap.
+
+\textbf{Learned candidate filter.} The refined pipeline still has about five false positives
+per image, many on places that no annotator marked. A LightGBM regressor predicts, for each
+refined candidate, the share of the image's annotators whose filament it matches at IoU above
+0.5, which is what PQ counts. Its 17 features describe shape (area, bounding box, elongation,
+solidity), first-stage probability (mean, maximum, 90th percentile, mean in a 20-pixel ring),
+darkness (inside, ring, contrast and spread, relative to the disk median), the radial position
+on the disk and the number of candidates in the image. It learns from the 5,081 out-of-fold
+refined candidates. The features use the mean map of one fold's 1024 and 2048 models, as in
+training; at test time each candidate is scored with each fold's map and the five scores are
+averaged. Candidates with a score below 0.35 are removed.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/examples.png}
+\caption{Out-of-fold example segmentations with low, median and high per-image PQ. Annotators
+in cyan, yellow and magenta; our masks in red. Left: the annotator marks a long faint filament
+that we miss, and our masks cover other parts of the marked filaments than the annotator's
+outlines. Middle: three annotators and our masks agree on three filaments; one annotator also
+marks a small filament at the top that the others and our model leave out. Right: close
+agreement.}
+\label{fig:examples}
+\end{figure*}
+
+% ==================================== %
+%              EVALUATION              %
+% ==================================== %
+\section{Evaluation}\label{sec:evaluation}
+
+\subsection{Strategy}
+
+We judge every change by out-of-fold PQ with the fixed post-processing. Two training seeds of
+the same model differ by up to 0.004 on one fold, so we kept a change only if it gained more
+than 0.007 on two folds. The filter is judged by nested cross-validation: for each outer
+fold, it is trained on the other four folds, its threshold is chosen by an inner 4-fold
+cross-validation on those folds, and both are applied to the outer fold, so no score uses a
+threshold tuned on its own images. For the final pipeline we report per-fold scores, the
+spread over folds, and a bootstrap over images (2,000 samples) for pooled PQ and for the
+paired gains. The organisers' own plotting code draws the distributions and matching counts.
+
+\subsection{Results}
+
+\begin{table}[t]
+\caption{Out-of-fold PQ per fold, mean and standard deviation over folds.}
+\label{tab:folds}
+\centering
+\small
+\begin{tabular}{lccccc|c}
+\toprule
+Pipeline & F0 & F1 & F2 & F3 & F4 & mean $\pm$ sd \\
+\midrule
+1024 model & .410 & .421 & .406 & .406 & .422 & .413 $\pm$ .008 \\
+2048 model & .415 & .431 & .422 & .423 & .431 & .425 $\pm$ .007 \\
+1024 + 2048 & .420 & .434 & .419 & .423 & .436 & .426 $\pm$ .008 \\
++ seed refiner & .427 & .440 & .419 & .428 & .443 & .432 $\pm$ .010 \\
++ learned filter & .446 & .446 & .435 & .442 & .456 & .445 $\pm$ .007 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\columnwidth]{figures/folds_errorbars.png}
+\caption{Out-of-fold PQ per pipeline: mean $\pm$ standard deviation over the five folds
+(blue) and each fold (gray).}
+\label{fig:folds}
+\end{figure}
+
+Table~\ref{tab:folds} and Fig.~\ref{fig:folds} give the scores. The fold spread (0.007--0.010)
+is larger than the gains, because folds differ in difficulty; the paired comparisons are
+clearer. The 1024 + 2048 mean beats the 1024 model on every fold (+0.013 on average). The
+refiner gains on four folds and is neutral on fold 2; the filter gains on all five folds
+(+0.006 to +0.018). Pooled over all 707 images, PQ is 0.426 [0.416, 0.435] for the first stage,
+0.431 [0.422, 0.440] after the refiner and 0.445 [0.435, 0.454] after the filter (95\% bootstrap
+intervals). The paired gains are +0.0054 [0.0032, 0.0078] for the refiner and +0.0136 [0.0106,
+0.0168] for the filter, both positive in all 2,000 samples. These intervals cover the choice of
+images, not training noise (about 0.003 between refiner seeds). On the public leaderboard the
+four pipelines scored 0.35, 0.36, 0.37 and 0.38; the public score never moved against the local
+score and stays about 0.06 below it.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/iou_distribution.png}
+\includegraphics[width=\columnwidth]{figures/matching_counts.png}
+\caption{Out of fold, all 707 images, drawn with the organisers' plotting code. Top: IoU of
+overlapping (GT, prediction) pairs. Bottom: matching cases; ``2:1'' is a prediction that
+overlaps two GT filaments, ``1:2'' a GT filament that overlaps two predictions.}
+\label{fig:official}
+\end{figure}
+
+Fig.~\ref{fig:official} compares the first stage with the final pipeline. Refiner and filter
+together remove 1,411 false positives (3,437 $\to$ 2,026) at the cost of 350 more false
+negatives (2,870 $\to$ 3,220). The GT filaments that overlap two or more predictions fall from
+394 to 242; the predictions that overlap two or more GT filaments stay about the same (257
+$\to$ 262; the refiner alone raised them to 281). The mean IoU of overlapping pairs rises from
+0.570 to 0.590 (Dice 0.703 $\to$ 0.722).
+
+\subsection{Strengths, weaknesses and possible improvements}
+\label{sec:weak}
+
+\textbf{Strengths.} The pipeline is simple, has few tuned values, and every choice was
+validated out of fold on two or more folds. It runs at 1.5\,s per image on one RTX~3070
+(0.83\,s for the 2048 models) and 79\,s on four CPU threads. On a GPU it is deterministic: the
+notebook in our repository rebuilds the submitted CSV with the same SHA-256 from the stored
+weights on the same GPU type; on another GPU type the masks agree with a mean IoU of 0.9998,
+and on a CPU with 0.997.
+
+\textbf{Weaknesses.} On fold 0, only 42 of 746 false positives are merges and 65 of 552 false
+negatives are fragments. Most other errors are \emph{near misses}: one prediction on one GT
+filament with IoU at most 0.5 (324 pairs, median IoU 0.35). In 82\% of them the prediction is
+smaller than the GT. The near-miss rate is 6--30\% per annotator and does not rise with an
+annotator's outline size, so it is a model weakness, not one drawing style. Neither growing
+masks into low-probability pixels (+0.001) nor the refiner fixed it.
+
+\textbf{What did not help} (all out of fold, same post-processing): a majority-vote or
+random-annotator target instead of the soft mean ($-0.003$, $-0.005$); a mean-probability
+filter on candidates (+0.003); eight flips and rotations as test-time augmentation (+0.004 and
+$-0.003$ on two folds, at four times the cost); a ResNet50 encoder at 1024 (+0.004 as a third
+model, +0.006 instead of the ResNet34); averaging two refiner seeds (no gain); a focal + Dice
+loss ($-0.005$); six more filter features (two per-resolution probabilities, their
+difference, edge strength, ring spread, dark quantile: $-0.0004$); and an auxiliary spine output trained on the MAGFiLO spines (+0.005 and +0.003
+for the 1024 model alone, but only +0.001 inside the 1024 + 2048 mean).
+
+\textbf{Possible improvements.} A refiner that uses the spine to cover the whole filament
+(spine supervision of the first stage did not help); an instance-aware split of refined masks that
+touch two filaments; and self-supervised pretraining on unlabeled H$\alpha$ archives, which
+the organisers allow when it excludes the test observations.
+
+% ==================================== %
+%            ACKNOWLEDGMENT            %
+% ==================================== %
+\section{Acknowledgment}\label{sec:acknowledgment}
+    % Do not change
+    The organization of the Filament Segmentation Challenge 2026 is partially supported by the U.S. National Science Foundation (NSF) under Grant No. 2209912 and 2433781, directorate for Computer and Information Science and Engineering (CSE), and Office of Advanced Cyberinfrastructure (OAC), and Grant No. 2511630, AST Division Of Astronomical Sciences and MPS Directorate for Mathematical and Physical Sciences.
+
+    The Filament Segmentation Challenge 2026 is sponsored by the U.S. National Science Foundation (NSF) National Solar Observatory (NSO). 
+
+    This work utilizes GONG data obtained by the NSO Integrated Synoptic Program, managed by the National Solar Observatory, which is operated by the Association of Universities for Research in Astronomy (AURA), Inc. under a cooperative agreement with the National Science Foundation and with contribution from the National Oceanic and Atmospheric Administration. The GONG network of instruments is hosted by the Big Bear Solar Observatory, High Altitude Observatory, Learmonth Solar Observatory, Udaipur Solar Observatory, Instituto de Astrofísica de Canarias, and Cerro Tololo Interamerican Observatory.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{main}
+
+\end{document}

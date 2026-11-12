@@ -1,0 +1,162 @@
+{
+  "file": "mix_r34_1024_2048_f01234.csv",
+  "sha256": "3a695bb0d3df4aa98be5dd3cc2e93c3cdc793379aa03ea099d77ee7ed8485df4",
+  "created_utc": "2026-10-31T09:15:19+00:00",
+  "git_commit": "4832a2e18ad87dc44cf419147486b1c6f48d663c",
+  "git_dirty": false,
+  "models": {
+    "data/models/unet_r34_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_f0",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2"
+    },
+    "data/models/unet_r34_r2048_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_r2048_f0",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_f1",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft"
+    },
+    "data/models/unet_r34_r2048_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_r2048_f1",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_f2",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_r2048_f2",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_f3",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_r2048_f3",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_f4",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "data/models/unet_r34_r2048_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_r2048_f4",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    }
+  },
+  "postprocess": {
+    "threshold": 0.5,
+    "min_area": 300,
+    "merge_dist": 15,
+    "seed_threshold": null,
+    "min_mean_prob": null,
+    "tta": "hflip",
+    "ensemble": "mean of probability maps of 10 models"
+  },
+  "cv": {
+    "oof_pair_per_fold": [
+      0.4199,
+      0.4336,
+      0.4192,
+      0.4229,
+      0.4363
+    ],
+    "oof_pair_mean": 0.4264,
+    "oof_A_mean": 0.4132,
+    "note": "the 10-model mix has no out-of-fold score; each pair is scored on its own fold"
+  },
+  "rows": 1403,
+  "images": 177,
+  "note": "5-fold 1024 + 2048 ensemble. Approved by the supervisor session for Nhat.",
+  "lb_public": 0.36,
+  "kaggle_submission_id": 57833984
+}

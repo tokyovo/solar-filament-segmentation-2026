@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# Competition data. NEVER commit any of this.
+#
+# This competition licenses its data for challenge use only -- some hosts
+# explicitly forbid uploading it to public repositories and mention legal
+# action. Derived artefacts (preprocessed caches, embeddings, extracted
+# features, OOF predictions, trained weights) are still competition data.
+# ---------------------------------------------------------------------------
+
+# Raw data directories
+data/
+runtime/
+/smoke/
+
+# Preprocessed caches and derived arrays (train_*.npz etc. are up to 4.5 GB)
+*.npz
+*.npy
+*.parquet
+*.nii.gz
+research/cache/
+
+# Trained model weights (derived from competition data)
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+model/
+model_*/
+submission_model/model/
+
+# Feature tables and label exports (these carry competition labels)
+research/*.csv
+
+# Submissions
+submission/*.zip
+submission/*.csv
+staging/*.csv
+
+# ---------------------------------------------------------------------------
+# Environments, caches, tooling
+# ---------------------------------------------------------------------------
+.venv/
+**/__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.gstack/
+*.log
+
+# CatBoost writes training artifacts next to the run; never source.
+catboost_info/
+
+# Claude Code worktrees: live git worktrees, never part of this repo
+.claude/worktrees/
+
+# Release weights: built by scripts/export_weights.py; Nhat decides how they are published.
+release/weights/
+release/*.csv
+release/*.tar

@@ -1,0 +1,291 @@
+{
+  "file": "mix10_refiner5_filter1.csv",
+  "sha256": "9fac0e35011809beeac63a4a9045ce0e73b8a603a30d7dab64745c195a862f72",
+  "created_utc": "2026-11-08T03:29:33+00:00",
+  "git_commit": "925f8584ba70e679c1fe60a3476385250df0a733",
+  "git_dirty": false,
+  "models": {
+    "release/weights/unet_r34_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_f0",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2"
+    },
+    "release/weights/unet_r34_r2048_f0": {
+      "fold": "0",
+      "out": "data/models/unet_r34_r2048_f0",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/refiner_v2_f0": {
+      "fold": 0,
+      "train_folds": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "release/weights/unet_r34_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_f1",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft"
+    },
+    "release/weights/unet_r34_r2048_f1": {
+      "fold": "1",
+      "out": "data/models/unet_r34_r2048_f1",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/refiner_v2_f1": {
+      "fold": 1,
+      "train_folds": [
+        0,
+        2,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "release/weights/unet_r34_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_f2",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/unet_r34_r2048_f2": {
+      "fold": "2",
+      "out": "data/models/unet_r34_r2048_f2",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/refiner_v2_f2": {
+      "fold": 2,
+      "train_folds": [
+        0,
+        1,
+        3,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "release/weights/unet_r34_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_f3",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/unet_r34_r2048_f3": {
+      "fold": "3",
+      "out": "data/models/unet_r34_r2048_f3",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/refiner_v2_f3": {
+      "fold": 3,
+      "train_folds": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "release/weights/unet_r34_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_f4",
+      "encoder": "resnet34",
+      "res": "1024",
+      "crop": "512",
+      "epochs": "60",
+      "batch": "8",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/unet_r34_r2048_f4": {
+      "fold": "4",
+      "out": "data/models/unet_r34_r2048_f4",
+      "encoder": "resnet34",
+      "res": "2048",
+      "crop": "1024",
+      "epochs": "60",
+      "batch": "4",
+      "lr": "0.0003",
+      "samples_per_image": "2",
+      "target": "soft",
+      "seed": "0"
+    },
+    "release/weights/refiner_v2_f4": {
+      "fold": 4,
+      "train_folds": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "epochs": 30,
+      "batch": 16,
+      "lr": 0.0003,
+      "seed": 0,
+      "crop": 256,
+      "margin": 1.5,
+      "min_side": 128,
+      "pp": {
+        "threshold": 0.5,
+        "min_area": 300,
+        "merge_dist": 15
+      }
+    },
+    "data/models/filter_v1": {
+      "kind": "candidate_filter",
+      "features": [
+        "n_candidates",
+        "area",
+        "log_area",
+        "bbox_h",
+        "bbox_w",
+        "major_axis",
+        "elongation",
+        "solidity",
+        "p_mean",
+        "p_max",
+        "p_q90",
+        "p_ring",
+        "i_inside",
+        "i_ring",
+        "contrast",
+        "i_inside_std",
+        "radial"
+      ],
+      "threshold": 0.35
+    }
+  },
+  "postprocess": {
+    "threshold": 0.5,
+    "min_area": 300,
+    "merge_dist": 15,
+    "tta": "hflip",
+    "ensemble": "mean of 10 first-stage maps",
+    "refiner": "mean of 5 seed refiners",
+    "filter": "LightGBM filter_v1, score averaged over the 5 per-fold pair maps, keep >= 0.35"
+  },
+  "cv": {
+    "oof_refined_pooled": 0.4312,
+    "oof_filtered_pooled_nested": 0.4449,
+    "per_fold_filtered": [
+      0.4455,
+      0.4464,
+      0.4354,
+      0.4417,
+      0.4558
+    ],
+    "test_removed_fraction": 0.152,
+    "oof_removed_fraction": 0.153
+  },
+  "rows": 1072,
+  "images": 177,
+  "note": "Refined 10-model pipeline + learned candidate filter. Generated on senai-0 GPU 0 (Quadro RTX 8000) from release/weights at commit 925f858. Approved by the supervisor for Nhat after the distribution check.",
+  "lb_public": 0.38,
+  "kaggle_submission_id": 58113312
+}
