@@ -249,7 +249,10 @@ intervals). The paired gains are +0.0054 [0.0032, 0.0078] for the refiner and +0
 0.0168] for the filter, both positive in all 2,000 samples. These intervals cover the choice of
 images, not training noise (about 0.003 between refiner seeds). On the public leaderboard the
 four pipelines scored 0.35, 0.36, 0.37 and 0.38; the public score never moved against the local
-score and stays about 0.06 below it.
+score and stays about 0.06 below it. On the 296 images with two or three annotators, our masks
+score PQ 0.446 (SQ 0.677) against each annotator, while one annotator scores 0.340 (SQ 0.634)
+against the others: the model agrees with each annotator more than the annotators agree with
+each other.
 
 \begin{figure}[t]
 \centering
@@ -278,12 +281,48 @@ notebook in our repository rebuilds the submitted CSV with the same SHA-256 from
 weights on the same GPU type; on another GPU type the masks agree with a mean IoU of 0.9998,
 and on a CPU with 0.997.
 
-\textbf{Weaknesses.} On fold 0, only 42 of 746 false positives are merges and 65 of 552 false
-negatives are fragments. Most other errors are \emph{near misses}: one prediction on one GT
-filament with IoU at most 0.5 (324 pairs, median IoU 0.35). In 82\% of them the prediction is
-smaller than the GT. The near-miss rate is 6--30\% per annotator and does not rise with an
-annotator's outline size, so it is a model weakness, not one drawing style. Neither growing
-masks into low-probability pixels (+0.001) nor the refiner fixed it.
+\textbf{Weaknesses: where the remaining PQ goes.} Table~\ref{tab:gap} splits the errors of the
+final pipeline (out of fold, all 707 images; \texttt{scripts/gap\_analysis.py}). Of the 1,878
+GT filaments that no prediction touches, 683 have no first-stage pixel above 0.5, 574 have
+fewer than 300 such pixels, and 271 were found by the refiner but removed by the filter, which
+pays for 1,000 fewer false positives. On images with two or three annotators, only 56\% of the
+missed filaments are also marked by another annotator, against 93\% of the matched ones: about
+half of the misses are one annotator's choice (Fig.~\ref{fig:disagree}, middle). Near misses go
+both ways: the prediction is smaller than the GT in 462 cases and larger in 370; 129 GT
+filaments are split and 189 predictions span two GT filaments (Fig.~\ref{fig:disagree},
+right). Growing or shrinking every mask by one pixel lowers PQ to 0.418 and 0.417, so there is
+no global bias to correct.
+
+\begin{table}[t]
+\caption{Error types of the final pipeline (out of fold) and the PQ if every case of the type
+were fixed (missed GT found at IoU 0.6, near misses at IoU 0.55, false positives removed).}
+\label{tab:gap}
+\centering
+\small
+\begin{tabular}{lrc}
+\toprule
+Error type & count & PQ if fixed \\
+\midrule
+Final pipeline (TP) & 4,979 & .445 \\
+GT never touched (IoU $<$ 0.05) & 1,878 & .528 \\
+Near-miss pairs (IoU 0.3--0.5) & 916 & .510 \\
+GT with weak overlap (0.05--0.3) & 426 & -- \\
+FP with no GT nearby & 697 & .466 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/disagreement.png}
+\caption{Zoomed out-of-fold cases from images with three annotators (cyan, yellow, magenta; our
+masks in red), each the largest GT filament of its kind. Left: the annotators' outlines of one
+filament differ widely (best agreement IoU 0.31) and our mask lies between them. Middle: one
+annotator marks a long faint filament near the limb that the other two and our model leave
+out. Right: a near miss where the annotators agree (IoU 0.72): they split the filament from its
+lower arm, our mask joins them (IoU 0.47).}
+\label{fig:disagree}
+\end{figure*}
 
 \textbf{What did not help} (all out of fold, same post-processing): a majority-vote or
 random-annotator target instead of the soft mean ($-0.003$, $-0.005$); a mean-probability
@@ -291,12 +330,18 @@ filter on candidates (+0.003); eight flips and rotations as test-time augmentati
 $-0.003$ on two folds, at four times the cost); a ResNet50 encoder at 1024 (+0.004 as a third
 model, +0.006 instead of the ResNet34); averaging two refiner seeds (no gain); a focal + Dice
 loss ($-0.005$); six more filter features (two per-resolution probabilities, their
-difference, edge strength, ring spread, dark quantile: $-0.0004$); and an auxiliary spine output trained on the MAGFiLO spines (+0.005 and +0.003
-for the 1024 model alone, but only +0.001 inside the 1024 + 2048 mean).
+difference, edge strength, ring spread, dark quantile: $-0.0004$); an auxiliary spine output trained on the MAGFiLO spines (+0.005 and +0.003
+for the 1024 model alone, but only +0.001 inside the 1024 + 2048 mean); more candidates for the
+filter (first-stage threshold 0.4, minimum area 150: $\pm$0.000 pooled); input cleaning as in
+EdgeAttNet~\cite{edgeattnet} (disk mask, radial flattening, CLAHE: $-0.004$ and $-0.002$); an
+auxiliary output for the contact zone between filaments (the zone is present in only 121 of
+707 images and the output stays at zero); and other weights than 0.5 for the 2048 map (best
+0.5).
 
 \textbf{Possible improvements.} A refiner that uses the spine to cover the whole filament
-(spine supervision of the first stage did not help); an instance-aware split of refined masks that
-touch two filaments; and self-supervised pretraining on unlabeled H$\alpha$ archives, which
+(spine supervision of the first stage did not help); an instance signal that reaches further
+than a contact zone, such as a per-filament embedding, to split masks that span two filaments;
+and self-supervised pretraining on unlabeled H$\alpha$ archives, which
 the organisers allow when it excludes the test observations.
 
 % ==================================== %

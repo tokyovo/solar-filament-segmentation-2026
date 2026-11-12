@@ -1,0 +1,17 @@
+quantity,count,pq_if_fixed
+final pipeline,4979,0.44483114989226685
+FN never detected (IoU < 0.05),1878,0.527854630778716
+  no first-stage pixel >= 0.5,683,
+  1-299 such pixels,574,
+  300 or more such pixels,621,
+  refined TP removed by the filter,271,
+FN weak overlap (0.05-0.3),426,
+near miss pairs (IoU 0.3-0.5),916,0.5103982136592463
+  prediction smaller than GT,462,
+  prediction larger than GT,370,
+  GT split over 2+ predictions,129,
+  prediction spans 2+ GT,189,
+FP with no GT nearby (IoU < 0.05),697,0.4662034054568157
+missed GT on multi-annotator images,1865,
+  also marked by another annotator,1049,
+matched GT also marked by another,2917,3128.0
